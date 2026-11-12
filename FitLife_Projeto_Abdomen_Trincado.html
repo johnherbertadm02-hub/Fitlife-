@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10191f">
+<title>FitLife | Projeto Abdômen Trincado</title>
+<style>
+:root{--bg:#10191f;--panel:#1b2a32;--panel2:#263a43;--green:#38d99b;--muted:#afc0c5;--white:#f5f8f8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px Arial,sans-serif}
+header{padding:26px 16px;text-align:center;background:#17272e;border-bottom:2px solid var(--green)}
+header h1{margin:0;color:var(--green);font-size:30px}header p{margin:8px 0;color:var(--muted)}
+main{max-width:960px;margin:auto;padding:16px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px}
+button,.tab{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer;background:var(--green);color:#092219}
+nav button{white-space:nowrap}.secondary{background:var(--panel2);color:var(--white)}.active{background:#fff;color:#14251e}
+.panel{background:var(--panel);border:1px solid #30434b;border-radius:14px;padding:17px;margin-bottom:15px}
+h2{color:var(--green);margin:0 0 14px}h3{margin:8px 0}
+small,.muted{color:var(--muted)}p{line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:var(--panel2);padding:13px;border-radius:10px;text-align:center}.stat strong{display:block;color:var(--green);font-size:25px;margin-bottom:4px}
+label{display:block;color:var(--muted);font-size:14px;margin-top:10px}
+input,select{width:100%;padding:12px;margin:6px 0 12px;background:var(--panel2);border:1px solid #52666e;color:white;border-radius:8px;font-size:16px}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}
+.progress{height:11px;background:#34464e;border-radius:20px;overflow:hidden}.progress>div{height:100%;background:var(--green)}
+.exercise,.day{background:var(--panel2);padding:13px;border-radius:10px;margin:9px 0}
+.exercise a{color:var(--green);font-weight:bold}.day{display:flex;align-items:center;justify-content:space-between;gap:10px}.day.done{border-left:4px solid var(--green)}
+.timer{text-align:center;font-size:46px;color:var(--green);margin:18px}
+.muscle{text-align:center;background:var(--panel2);padding:12px;border-radius:12px}.muscle svg{height:165px;max-width:100%}
+table{width:100%;border-collapse:collapse;margin-top:12px}td,th{text-align:left;padding:9px;border-bottom:1px solid #40535b;font-size:14px}
+footer{text-align:center;color:var(--muted);padding:22px}
+@media(max-width:540px){main{padding:11px}.stats{gap:6px}.stat{padding:10px}.stat strong{font-size:21px}.panel{padding:14px}}
+</style>
+</head>
+<body>
+<header><h1>FITLIFE 💪</h1><p>PROJETO ABDÔMEN TRINCADO • 30 DIAS</p><small>Treine com inteligência. Evolua com consistência.</small></header>
+<main>
+<nav id="nav"></nav><div id="app"></div>
+<footer>FITLIFE • Projeto Abdômen Trincado • Seus dados ficam salvos neste navegador.</footer>
+</main>
+<script>
+const exercises=[
+ {name:"Prancha abdominal",group:"Abdômen",dose:"3 × 20–30 segundos",home:true,video:"prancha abdominal execução correta"},
+ {name:"Abdominal tradicional",group:"Abdômen",dose:"3 × 10–15 repetições",home:true,video:"abdominal tradicional execução correta"},
+ {name:"Elevação de pernas",group:"Abdômen",dose:"2–3 × 8–12 repetições",home:true,video:"elevação de pernas abdominal execução"},
+ {name:"Abdominal bicicleta",group:"Abdômen",dose:"2–3 × 10 por lado",home:true,video:"abdominal bicicleta execução correta"},
+ {name:"Agachamento",group:"Pernas",dose:"3 × 10–12 repetições",home:true,video:"agachamento execução correta"},
+ {name:"Avanço",group:"Pernas",dose:"2–3 × 8–10 por perna",home:true,video:"avanço exercício execução correta"},
+ {name:"Elevação pélvica",group:"Pernas",dose:"3 × 12–15 repetições",home:true,video:"elevação pélvica execução correta"},
+ {name:"Flexão de braço",group:"Peito",dose:"2–3 × 6–12 repetições",home:true,video:"flexão de braço execução correta"},
+ {name:"Supino reto",group:"Peito",dose:"3 × 8–12 repetições",home:false,video:"supino reto execução correta"},
+ {name:"Remada",group:"Costas",dose:"3 × 8–12 repetições",home:false,video:"remada academia execução correta"},
+ {name:"Rosca direta",group:"Braços",dose:"2–3 × 10–12 repetições",home:false,video:"rosca direta execução correta"},
+ {name:"Caminhada ou bicicleta",group:"Cardio",dose:"20–30 minutos",home:true,video:"caminhada exercício cardiovascular"}
+];
+const weekly=[
+ {title:"Abdômen + cardio leve",items:["Prancha abdominal","Abdominal tradicional","Caminhada ou bicicleta"]},
+ {title:"Pernas e glúteos",items:["Agachamento","Avanço","Elevação pélvica"]},
+ {title:"Peito + abdômen",items:["Flexão de braço","Prancha abdominal","Abdominal bicicleta"]},
+ {title:"Recuperação ativa",items:["Caminhada ou bicicleta"]},
+ {title:"Costas e braços",items:["Remada","Rosca direta"]},
+ {title:"Corpo inteiro",items:["Agachamento","Flexão de braço","Abdominal bicicleta"]},
+ {title:"Descanso",items:[]}
+];
+const get=(key, fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
+let state={tab:"Início",day:1,place:"Casa",level:"Iniciante",done:get("fitlife_done",[]),records:get("fitlife_records",[]),seconds:60,timer:null};
+const app=document.getElementById("app"),nav=document.getElementById("nav");
+const save=()=>{localStorage.setItem("fitlife_done",JSON.stringify(state.done));localStorage.setItem("fitlife_records",JSON.stringify(state.records))};
+function setTab(tab){state.tab=tab;render()}
+function toggleTask(key){state.done=state.done.includes(key)?state.done.filter(x=>x!==key):[...state.done,key];save();render()}
+function videoLink(query){return "https://www.youtube.com/results?search_query="+encodeURIComponent(query)}
+function renderNav(){nav.innerHTML=["Início","Treinos","30 dias","Evolução","Cronômetro"].map(t=>`<button class="${state.tab===t?"active":"secondary"}" data-tab="${t}">${t}</button>`).join("");nav.querySelectorAll("button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab))}
+function exerciseCard(e){return `<article class="exercise"><div style="font-size:25px">💪</div><h3>${e.name}</h3><small>${e.group} • ${e.dose}</small><p><a href="${videoLink(e.video)}" target="_blank" rel="noopener">▶ Ver demonstração no YouTube</a></p></article>`}
+function render(){
+ renderNav();
+ const dayPlan=weekly[(state.day-1)%7];
+ const progress=Math.min(100,Math.round(state.done.length/90*100));
+ if(state.tab==="Início"){
+ app.innerHTML=`<section class="panel"><h2>Seu painel fitness</h2><div class="stats"><div class="stat"><strong>${state.done.length}</strong><small>Atividades concluídas</small></div><div class="stat"><strong>${state.records.length}</strong><small>Registros físicos</small></div><div class="stat"><strong>${state.day}/30</strong><small>Dia selecionado</small></div></div><h3>Consistência do programa</h3><div class="progress"><div style="width:${progress}%"></div></div><p class="muted">${progress}% das 90 atividades estimadas foram marcadas. É um indicador de registro, não de resultado físico.</p></section>
+ <section class="panel"><h2>Personalize seu treino</h2><label>Local de treino</label><select id="place"><option ${state.place==="Casa"?"selected":""}>Casa</option><option ${state.place==="Academia"?"selected":""}>Academia</option></select><label>Nível</label><select id="level"><option>Iniciante</option><option ${state.level==="Intermediário"?"selected":""}>Intermediário</option><option ${state.level==="Avançado"?"selected":""}>Avançado</option></select><p class="muted">Ajuste os exercícios à sua experiência, condição física e equipamentos disponíveis.</p></section>
+ <section class="panel"><h2>Treino recomendado</h2><h3>Dia ${state.day}: ${dayPlan.title}</h3>${dayPlan.items.length?dayPlan.items.map(n=>`<p>• ${n}</p>`).join(""):"<p>Dia de descanso. Priorize recuperação e sono.</p>"}<button id="openPlan">Abrir programa de 30 dias</button></section>
+ <section class="panel"><h2>Ilustração da região abdominal</h2><div class="muscle"><svg viewBox="0 0 180 175" role="img" aria-label="Ilustração esquemática do tronco e abdômen"><circle cx="90" cy="18" r="13" fill="#d7b99d"/><path d="M68 36Q45 42 55 65L62 110Q65 132 90 139Q115 132 118 110L125 65Q135 42 112 36Z" fill="#d7b99d"/><path d="M70 49Q90 43 110 49L108 116Q90 129 72 116Z" fill="#38d99b"/><path d="M90 49V119M72 69H108M72 90H108" stroke="#167e5a" stroke-width="2" fill="none"/><path d="M57 46L38 94M123 46L142 94" stroke="#d7b99d" stroke-width="9" stroke-linecap="round"/><path d="M75 128L68 163M105 128L112 163" stroke="#d7b99d" stroke-width="12" stroke-linecap="round"/></svg><p><b>Fortalecimento abdominal faz parte de um programa global de condicionamento.</b></p></div></section>`;
+ document.getElementById("place").onchange=e=>{state.place=e.target.value;render()};
+ document.getElementById("level").onchange=e=>{state.level=e.target.value};
+ document.getElementById("openPlan").onclick=()=>setTab("30 dias");
+ }
+ if(state.tab==="Treinos"){
+ const list=exercises.filter(e=>state.place==="Academia"||e.home);
+ app.innerHTML=`<section class="panel"><h2>Biblioteca de exercícios</h2><p class="muted">Os links abrem resultados de demonstrações no YouTube.</p>${list.map(exerciseCard).join("")}</section>`;
+ }
+ if(state.tab==="30 dias"){
+ app.innerHTML=`<section class="panel"><h2>Programa de 30 dias</h2><label>Escolha o dia</label><select id="day">${Array.from({length:30},(_,i)=>`<option value="${i+1}" ${state.day===i+1?"selected":""}>Dia ${i+1}</option>`).join("")}</select><h3>Dia ${state.day}: ${dayPlan.title}</h3>${dayPlan.items.length?dayPlan.items.map(n=>{const e=exercises.find(x=>x.name===n),key=state.day+"-"+n,checked=state.done.includes(key);return `<div class="day ${checked?"done":""}"><div><b>${n}</b><br><small>${e?.dose||""}</small></div><button data-task="${encodeURIComponent(key)}">${checked?"✓ Feito":"Concluir"}</button></div>`}).join(""):"<p>Dia de descanso ou recuperação ativa leve.</p>"}<p class="muted">A sequência semanal se repete ao longo dos 30 dias. Comece com volume confortável, mantenha a técnica e progrida gradualmente. O plano é uma sugestão geral, não uma prescrição individual.</p></section>`;
+ document.getElementById("day").onchange=e=>{state.day=Number(e.target.value);render()};
+ app.querySelectorAll("[data-task]").forEach(b=>b.onclick=()=>toggleTask(decodeURIComponent(b.dataset.task)));
+ }
+ if(state.tab==="Evolução"){
+ app.innerHTML=`<section class="panel"><h2>Acompanhamento corporal</h2><p>Registre medidas em condições semelhantes, por exemplo no mesmo período do dia.</p><label>Peso (kg)</label><input id="weight" type="number" min="0" step="0.1" placeholder="Ex.: 75,5"><label>Circunferência abdominal (cm)</label><input id="waist" type="number" min="0" step="0.1" placeholder="Ex.: 90"><button id="saveRecord">Salvar registro</button><h3>Histórico</h3>${state.records.length?`<table><thead><tr><th>Data</th><th>Peso (kg)</th><th>Cintura (cm)</th></tr></thead><tbody>${[...state.records].reverse().map(r=>`<tr><td>${r.date}</td><td>${r.weight}</td><td>${r.waist}</td></tr>`).join("")}</tbody></table>`:"<p class='muted'>Seus registros aparecerão aqui.</p>"}<p class="muted">Observe tendências ao longo de várias semanas, não oscilações isoladas. Não é possível escolher de onde o corpo perde gordura.</p></section>`;
+ document.getElementById("saveRecord").onclick=()=>{const w=document.getElementById("weight").value,c=document.getElementById("waist").value;if(!w&&!c){alert("Informe pelo menos peso ou cintura.");return}state.records.push({date:new Date().toLocaleDateString("pt-BR"),weight:w||"—",waist:c||"—"});save();render()};
+ }
+ if(state.tab==="Cronômetro"){
+ app.innerHTML=`<section class="panel"><h2>Cronômetro de descanso</h2><div class="timer" id="clock">${String(Math.floor(state.seconds/60)).padStart(2,"0")}:${String(state.seconds%60).padStart(2,"0")}</div><div class="row"><button data-time="60">60 s</button><button data-time="90">90 s</button><button data-time="120">120 s</button></div><br><div class="row"><button id="start">${state.timer?"Pausar":"Iniciar"}</button><button class="secondary" id="reset">Zerar</button></div></section>`;
+ app.querySelectorAll("[data-time]").forEach(b=>b.onclick=()=>{stopTimer();state.seconds=Number(b.dataset.time);render()});
+ document.getElementById("start").onclick=()=>state.timer?stopTimer():startTimer();
+ document.getElementById("reset").onclick=()=>{stopTimer();state.seconds=60;render()};
+ }
+}
+function startTimer(){if(state.seconds<=0)state.seconds=60;state.timer=setInterval(()=>{state.seconds--;const el=document.getElementById("clock");if(el)el.textContent=String(Math.floor(state.seconds/60)).padStart(2,"0")+":"+String(state.seconds%60).padStart(2,"0");if(state.seconds<=0){stopTimer();alert("Descanso concluído!");}},1000);render()}
+function stopTimer(){if(state.timer){clearInterval(state.timer);state.timer=null}}
+render();
+</script>
+</body>
+</html>
